@@ -8,7 +8,8 @@ If this test works, SHERIFS should run fine as well.
 import time
 import os
 import sys
-path_actuel=os.path.dirname(os.path.abspath(__file__))
+
+path_actuel = os.path.dirname(os.path.abspath(__file__))
 path_lib = path_actuel + '/lib'
 sys.path.append(path_lib)
 path_f = path_lib + '/logic_tree'
@@ -36,6 +37,7 @@ from matplotlib.patches import Polygon
 import matplotlib.patches as patches
 import matplotlib.path as mplPath
 from scipy.stats import gaussian_kde
+
 mpl.interactive(False)
 import Extract_data
 import Plot_mfd
@@ -54,7 +56,6 @@ from glob import glob
 import xml.etree.ElementTree as ET
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.collections import PolyCollection
-
 
 # w_sc_nb = tk.Tk()
 # w_sc_nb.title('OK?')

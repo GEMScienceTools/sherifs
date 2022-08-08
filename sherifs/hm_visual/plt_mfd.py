@@ -10,14 +10,20 @@ Version 1.4
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def add_data(data):
     x = data[0]
     y = data[1]
     #plt.scatter(x,y, c='grey', s=50, edgecolor='',marker = 'o',alpha = 0.7)
-    plt.plot(x,y,'k', linewidth = 3 ,alpha = 0.8, label='cumulative catalogue MFD')
+    plt.plot(x,
+             y,
+             'k',
+             linewidth=3,
+             alpha=0.8,
+             label='cumulative catalogue MFD')
 
 
-def plot(x,y,lim,axis,data,path,title):
+def plot(x, y, lim, axis, data, path, title):
     '''
     x : list, bining in magnitude
     y : list, mfd values (same length as x)
@@ -31,18 +37,30 @@ def plot(x,y,lim,axis,data,path,title):
     y = list(y)
     y_cum = list(np.cumsum(np.array(y[::-1])))
     y_cum = y_cum[::-1]
-    plt.scatter(x,y, c='darkcyan', s=50, marker = 's',alpha = 0.7, label='SHERIFS incremental MFD')
-    plt.plot(x,y_cum,'darkgreen', linewidth = 2 ,alpha = 0.8, label='SHERIFS cumulative MFD')
-    if not data == False :
+    plt.scatter(x,
+                y,
+                c='darkcyan',
+                s=50,
+                marker='s',
+                alpha=0.7,
+                label='SHERIFS incremental MFD')
+    plt.plot(x,
+             y_cum,
+             'darkgreen',
+             linewidth=2,
+             alpha=0.8,
+             label='SHERIFS cumulative MFD')
+    if not data == False:
         add_data(data)
     plt.yscale('log')
     plt.title(title)
     plt.legend()
     plt.grid()
-    plt.savefig(path,dpi = 180, transparent=False)
+    plt.savefig(path, dpi=180, transparent=False)
     plt.close()
 
-def plot_bg_ft(x,ys,lim,axis,path,title):
+
+def plot_bg_ft(x, ys, lim, axis, path, title):
     '''
     x : list, bining in magnitude
     y : list, mfd values for whole model, faults, bg (3 x same length as x)
@@ -56,32 +74,42 @@ def plot_bg_ft(x,ys,lim,axis,path,title):
     y = list(ys[0])
     y_cum = list(np.cumsum(np.array(y[::-1])))
     y_cum = y_cum[::-1]
-    plt.plot(x,y_cum,'darkgreen', linewidth = 2 ,
-    alpha = 0.8, label='SHERIFS cumulative MFD')
-
+    plt.plot(x,
+             y_cum,
+             'darkgreen',
+             linewidth=2,
+             alpha=0.8,
+             label='SHERIFS cumulative MFD')
 
     y = list(ys[1])
     y_cum = list(np.cumsum(np.array(y[::-1])))
     y_cum = y_cum[::-1]
-    plt.plot(x,y_cum,'red', linewidth = 2 ,
-    alpha = 0.8, label='Faults cumulative MFD')
-
+    plt.plot(x,
+             y_cum,
+             'red',
+             linewidth=2,
+             alpha=0.8,
+             label='Faults cumulative MFD')
 
     y = list(ys[2])
     y_cum = list(np.cumsum(np.array(y[::-1])))
     y_cum = y_cum[::-1]
-    plt.plot(x,y_cum,'blue', linewidth = 2 ,
-    alpha = 0.8, label='Background cumulative MFD')
+    plt.plot(x,
+             y_cum,
+             'blue',
+             linewidth=2,
+             alpha=0.8,
+             label='Background cumulative MFD')
 
     plt.yscale('log')
     plt.title(title)
     plt.legend()
     plt.grid()
-    plt.savefig(path,dpi = 180, transparent=False)
+    plt.savefig(path, dpi=180, transparent=False)
     plt.close()
 
 
-def local(x,ys,data,lim,axis,path,title):
+def local(x, ys, data, lim, axis, path, title):
     '''
     x : list, bining in magnitude
     y : list, mfd values for whole model, faults, bg
@@ -96,22 +124,32 @@ def local(x,ys,data,lim,axis,path,title):
     y = list(ys[0])
     y_cum = list(np.cumsum(np.array(y[::-1])))
     y_cum = y_cum[::-1]
-    plt.plot(x,y_cum,'darkgreen', linewidth = 2 ,
-    alpha = 0.8, label='SHERIFS cumulative MFD')
-
+    plt.plot(x,
+             y_cum,
+             'darkgreen',
+             linewidth=2,
+             alpha=0.8,
+             label='SHERIFS cumulative MFD')
 
     y = list(ys[1])
     y_cum = list(np.cumsum(np.array(y[::-1])))
     y_cum = y_cum[::-1]
-    plt.plot(x,y_cum,'red', linewidth = 2 ,
-    alpha = 0.8, label='Faults cumulative MFD')
-
+    plt.plot(x,
+             y_cum,
+             'red',
+             linewidth=2,
+             alpha=0.8,
+             label='Faults cumulative MFD')
 
     y = list(ys[2])
     y_cum = list(np.cumsum(np.array(y[::-1])))
     y_cum = y_cum[::-1]
-    plt.plot(x,y_cum,'blue', linewidth = 2 ,
-    alpha = 0.8, label='Background cumulative MFD')
+    plt.plot(x,
+             y_cum,
+             'blue',
+             linewidth=2,
+             alpha=0.8,
+             label='Background cumulative MFD')
 
     # y = list(ys[3])
     # y_cum = list(np.cumsum(np.array(y[::-1])))
@@ -119,12 +157,12 @@ def local(x,ys,data,lim,axis,path,title):
     # plt.plot(x,y_cum,'blue', linewidth = 0.5 ,
     # alpha = 0.8, label='smoothing MFD (preSHERIFS)')
 
-    if not data == False :
+    if not data == False:
         add_data(data)
 
     plt.yscale('log')
     plt.title(title)
     plt.legend()
     plt.grid()
-    plt.savefig(path,dpi = 180, transparent=False)
+    plt.savefig(path, dpi=180, transparent=False)
     plt.close()

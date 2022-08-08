@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 SHERIFS
 Seismic Hazard and Earthquake Rates In Fault Systems
@@ -58,13 +57,15 @@ def SHERIFS(input_file):
     Sources_Logic_Tree_Creator(param, calculation_log_file)
     calculation_log_file.close()
 
-    fin = time.time()-debut
+    fin = time.time() - debut
     print(type(fin))
     days = int(fin / 24. / 60. / 60.)
     hours = int((fin - days * 24. * 60. * 60.) / 60. / 60.)
-    minutes = int((fin - days * 24. * 60. * 60. - hours* 60. * 60. ) / 60.)
-    seconds = (fin - days * 24. * 60. * 60. - hours* 60. * 60.  - minutes * 60.)
-    print("The calculation took: " + str(days) + ' days, ' + str(hours) + ' hours, ' + str(minutes) + ' minutes and ' + str(seconds) + ' seconds.')
+    minutes = int((fin - days * 24. * 60. * 60. - hours * 60. * 60.) / 60.)
+    seconds = (fin - days * 24. * 60. * 60. - hours * 60. * 60. - minutes * 60.)
+    print("The calculation took: " + str(days) + ' days, ' + str(hours) +
+          ' hours, ' + str(minutes) + ' minutes and ' + str(seconds) +
+          ' seconds.')
 
 
 def main(argv):

@@ -15,7 +15,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with OpenQuake. If not, see <http://www.gnu.org/licenses/>.
-
 """
 Here is a minimal example of usage:
 .. code-block:: python
@@ -46,7 +45,6 @@ import sys
 import inspect
 import argparse
 
-
 NODEFAULT = object()
 registry = {}  # dotname -> function
 
@@ -60,8 +58,7 @@ def get_parentparser(parser, description=None, help=True):
               attribute (if set) or the parser itself (if not set)
     """
     if parser is None:
-        return argparse.ArgumentParser(
-            description=description, add_help=help)
+        return argparse.ArgumentParser(description=description, add_help=help)
     elif hasattr(parser, 'parentparser'):
         return parser.parentparser
     else:
@@ -82,10 +79,16 @@ class Script(object):
     composed together, by dispatching on a given name (if not given,
     the function name is used).
     """
+
     # for instance {'openquake.commands.run': run, ...}
 
-    def __init__(self, func, name=None, parentparser=None,
-                 help=True,):
+    def __init__(
+        self,
+        func,
+        name=None,
+        parentparser=None,
+        help=True,
+    ):
         self.func = func
         self.name = name or func.__name__
         args, self.varargs, varkw, defaults = inspect.getfullargspec(func)[:4]
@@ -114,17 +117,25 @@ class Script(object):
         """
         argname = list(self.argdict)[self._argno]
         if argname != name:
-            raise NameError(
-                'Setting argument %s, but it should be %s' % (name, argname))
+            raise NameError('Setting argument %s, but it should be %s' %
+                            (name, argname))
         self._group.add_argument(*args, **kw)
         self.all_arguments.append((args, kw))
         self.names.append(name)
         self._argno += 1
 
-    def arg(self, name, help, type=None, choices=None, metavar=None,
+    def arg(self,
+            name,
+            help,
+            type=None,
+            choices=None,
+            metavar=None,
             nargs=None):
         """Describe a positional argument"""
-        kw = dict(help=help, type=type, choices=choices, metavar=metavar,
+        kw = dict(help=help,
+                  type=type,
+                  choices=choices,
+                  metavar=metavar,
                   nargs=nargs)
         default = self.argdict[name]
         if default is not NODEFAULT:
@@ -133,10 +144,19 @@ class Script(object):
             kw['help'] = kw['help'] + ' [default: %s]' % repr(default)
         self._add(name, name, **kw)
 
-    def opt(self, name, help, abbrev=None,
-            type=None, choices=None, metavar=None, nargs=None):
+    def opt(self,
+            name,
+            help,
+            abbrev=None,
+            type=None,
+            choices=None,
+            metavar=None,
+            nargs=None):
         """Describe an option"""
-        kw = dict(help=help, type=type, choices=choices, metavar=metavar,
+        kw = dict(help=help,
+                  type=type,
+                  choices=choices,
+                  metavar=metavar,
                   nargs=nargs)
         default = self.argdict[name]
         if default is not NODEFAULT:
@@ -196,8 +216,7 @@ def script(func):
     return func
 
 
-def compose(scripts, name='main', description=None, prog=None,
-            version=None):
+def compose(scripts, name='main', description=None, prog=None, version=None):
     """
     Collects together different scripts and builds a single
     script dispatching to the subparsers depending on
@@ -209,13 +228,14 @@ def compose(scripts, name='main', description=None, prog=None,
     :param version: version of the script printed with --version
     """
     assert len(scripts) >= 1, scripts
-    parentparser = argparse.ArgumentParser(
-        description=description, add_help=False)
-    parentparser.add_argument(
-        '--version', '-v', action='version', version=version)
+    parentparser = argparse.ArgumentParser(description=description,
+                                           add_help=False)
+    parentparser.add_argument('--version',
+                              '-v',
+                              action='version',
+                              version=version)
     subparsers = parentparser.add_subparsers(
-        help='available subcommands; use %s help <subcmd>' % prog,
-        prog=prog)
+        help='available subcommands; use %s help <subcmd>' % prog, prog=prog)
 
     def gethelp(cmd=None):
         if cmd is None:
@@ -226,6 +246,7 @@ def compose(scripts, name='main', description=None, prog=None,
             print('No help for unknown command %r' % cmd)
         else:
             print(subp.format_help())
+
     help_script = Script(gethelp, 'help', help=False)
     progname = '%s ' % prog if prog else ''
     help_script.arg('cmd', progname + 'subcommand')
@@ -242,5 +263,6 @@ def compose(scripts, name='main', description=None, prog=None,
             parentparser.print_usage()
         else:
             return func(**kw)
+
     main.__name__ = name
     return Script(main, name, parentparser)

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 Prepare the input fils and ruptures for SHERIFS
 Seismic Hazard and Earthquake Rates In Fault Systems
@@ -64,17 +63,14 @@ def build_rup(input_file):
     maxmin_pt_lon, maxmin_pt_lat = find_bounding_box(faults)
 
     #find possible fault asso
-    assso_fault = find_possible_asso(maxmin_pt_lon,maxmin_pt_lat)
+    assso_fault = find_possible_asso(maxmin_pt_lon, maxmin_pt_lat)
 
     # calc fault dimensions
     f_lengths, f_areas = calc_f_dims(faults,)
 
     # cutting into smaller sections
-    f_for_sherifs,id_sections_fault,sections_areas_tot,sections_lengths_tot = cut_faults(faults,
-    f_lengths,
-    f_areas,
-    path,
-    rupture_mesh_spacing)
+    f_for_sherifs, id_sections_fault, sections_areas_tot, sections_lengths_tot = cut_faults(
+        faults, f_lengths, f_areas, path, rupture_mesh_spacing)
 
     # force jumps
     force_jump_on_fault = force_jump_list()
@@ -87,7 +83,7 @@ def build_rup(input_file):
     export_sections_pts(f_for_sherifs, path)
 
     # find max rupture size for each section
-    f_for_sherifs = find_sections_Mmax(f_for_sherifs,File_Mmax_areas)
+    f_for_sherifs = find_sections_Mmax(f_for_sherifs, File_Mmax_areas)
 
     # create SHERIFS input dict for fault prperties
     f_for_sherifs = to_sherifs(f_for_sherifs, faults, Model_name,
@@ -111,11 +107,11 @@ def build_rup(input_file):
     # Create visualization of ruptures
     visu_rup(f_for_sherifs, rup, rup_param[0], rup_param[1], path)
 
-    fin = time.time()-debut
+    fin = time.time() - debut
     days = int(fin / 24. / 60. / 60.)
     hours = int((fin - days * 24. * 60. * 60.) / 60. / 60.)
-    minutes = int((fin - days * 24. * 60. * 60. - hours* 60. * 60. ) / 60.)
-    seconds = (fin - days * 24. * 60. * 60. - hours* 60. * 60.  - minutes * 60.)
+    minutes = int((fin - days * 24. * 60. * 60. - hours * 60. * 60.) / 60.)
+    seconds = (fin - days * 24. * 60. * 60. - hours * 60. * 60. - minutes * 60.)
     print("The calculation took: " + str(days) + ' days, ' + str(hours) +
           ' hours, ' + str(minutes) + ' minutes and ' + str(seconds) +
           ' seconds.')

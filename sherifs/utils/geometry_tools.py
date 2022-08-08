@@ -7,29 +7,32 @@ Version 1.2
 @author: Thomas Chartier
 """
 import numpy as np
-from math import pi, cos, radians , sin, asin, sqrt, atan2, degrees
+from math import pi, cos, radians, sin, asin, sqrt, atan2, degrees
+
 
 def reproject(latitude, longitude):
     """Returns the x & y coordinates in meters using a sinusoidal projection"""
-    earth_radius = 6371009 # in meters
+    earth_radius = 6371009  # in meters
     lat_dist = pi * earth_radius / 180.0
     y = [lat * lat_dist for lat in latitude]
-    x = [long * lat_dist * cos(radians(lat))
-                for lat, long in zip(latitude, longitude)]
+    x = [
+        long * lat_dist * cos(radians(lat))
+        for lat, long in zip(latitude, longitude)
+    ]
     return x, y
 
 
-
 def points_aligned(a, b, c):
-    crossproduct = (c[1] - a[1]) * (b[0] -a[0]) - (c[0] -a[0]) * (b[1] - a[1])
+    crossproduct = (c[1] - a[1]) * (b[0] - a[0]) - (c[0] - a[0]) * (b[1] - a[1])
     epsilon = 10000000.
     if abs(crossproduct) > epsilon:
         return False
-    dotproduct = (c[0] - a[0]) * (b[0] - a[0]) + (c[1] - a[1])*(b[1] - a[1])
+    dotproduct = (c[0] - a[0]) * (b[0] - a[0]) + (c[1] - a[1]) * (b[1] - a[1])
     if dotproduct < 0:
         return False
 
-    squaredlengthba = (b[0]-a[0])*(b[0] - a[0]) + (b[1] - a[1])*(b[1]-a[1])
+    squaredlengthba = (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] -
+                                                                       a[1])
     if dotproduct > squaredlengthba:
         return False
 
@@ -66,15 +69,17 @@ def point_at(lon, lat, azimuth, distance):
     sin_lats = sin_lat * cos_dists + cos_lat * sin_dists * np.cos(tc)
     lats = np.degrees(np.arcsin(sin_lats))
 
-    dlon = np.arctan2(np.sin(tc) * sin_dists * cos_lat,
-                         cos_dists - sin_lat * sin_lats)
+    dlon = np.arctan2(
+        np.sin(tc) * sin_dists * cos_lat, cos_dists - sin_lat * sin_lats)
     lons = np.mod(lon - dlon + np.pi, 2 * np.pi) - np.pi
     lons = np.degrees(lons)
 
     return lons, lats
 
-def PolyArea(x,y):
-    return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
+
+def PolyArea(x, y):
+    return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
+
 
 def area_of_polygon(x, y):
     """Calculates the area of an arbitrary polygon given its verticies"""
@@ -84,31 +89,35 @@ def area_of_polygon(x, y):
     inn = []
     for i in range(len(x)):
         if i == 0:
-            if points_aligned([x[-1],y[-1]],[x[0],y[0]], [x[1],y[1]]) == False:
-                 x_vertices.append(x[i])
-                 y_vertices.append(y[i])
-                 inn.append(1)
+            if points_aligned([x[-1], y[-1]], [x[0], y[0]],
+                              [x[1], y[1]]) == False:
+                x_vertices.append(x[i])
+                y_vertices.append(y[i])
+                inn.append(1)
             else:
                 inn.append(0)
-        elif i == len(x)-1:
-            if points_aligned([x[-2],y[-2]], [x[-1],y[-1]],[x[0],y[0]]) == False:
-                 x_vertices.append(x[i])
-                 y_vertices.append(y[i])
-                 inn.append(1)
+        elif i == len(x) - 1:
+            if points_aligned([x[-2], y[-2]], [x[-1], y[-1]],
+                              [x[0], y[0]]) == False:
+                x_vertices.append(x[i])
+                y_vertices.append(y[i])
+                inn.append(1)
             else:
-                 inn.append(0)
+                inn.append(0)
         else:
-             if points_aligned([x[i-1],y[i-1]], [x[i],y[i]],[x[i+1],y[i+1]]) == False:
-                 x_vertices.append(x[i])
-                 y_vertices.append(y[i])
-                 inn.append(1)
-             else:
-                 inn.append(0)
+            if points_aligned([x[i - 1], y[i - 1]], [x[i], y[i]],
+                              [x[i + 1], y[i + 1]]) == False:
+                x_vertices.append(x[i])
+                y_vertices.append(y[i])
+                inn.append(1)
+            else:
+                inn.append(0)
     # print(len(x),len(x_vertices),inn)
     area = 0.0
-    for i in range(-1, len(x_vertices)-1):
-        area += x_vertices[i] * (y_vertices[i+1] - y_vertices[i-1])
+    for i in range(-1, len(x_vertices) - 1):
+        area += x_vertices[i] * (y_vertices[i + 1] - y_vertices[i - 1])
     return abs(area) / 2.0
+
 
 def line_intersection(line1, line2):
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
@@ -119,15 +128,14 @@ def line_intersection(line1, line2):
 
     div = det(xdiff, ydiff)
     if div == 0:
-       #raise Exception('lines do not intersect')
-       x = 'no_intesection'
-       y = 'no_intesection'
+        #raise Exception('lines do not intersect')
+        x = 'no_intesection'
+        y = 'no_intesection'
     else:
         d = (det(*line1), det(*line2))
         x = det(d, xdiff) / div
         y = det(d, ydiff) / div
     return x, y
-
 
 
 def calculate_initial_compass_bearing(pointA, pointB):
@@ -159,8 +167,7 @@ def calculate_initial_compass_bearing(pointA, pointB):
     diffLong = radians(pointB[1] - pointA[1])
 
     x = sin(diffLong) * cos(lat2)
-    y = cos(lat1) * sin(lat2) - (sin(lat1)
-            * cos(lat2) * cos(diffLong))
+    y = cos(lat1) * sin(lat2) - (sin(lat1) * cos(lat2) * cos(diffLong))
 
     initial_bearing = atan2(x, y)
 
@@ -183,7 +190,7 @@ def distance(lon1, lat1, lon2, lat2):
     # haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
     c = 2 * asin(sqrt(a))
     km = 6367 * c
     return km

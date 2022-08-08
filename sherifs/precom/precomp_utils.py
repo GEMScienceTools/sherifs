@@ -9,7 +9,8 @@ Version 1.2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from math import pi, cos, radians , sin, asin, sqrt, atan2, degrees, acos, radians
+from math import pi, cos, radians, sin, asin, sqrt, atan2, degrees, acos, radians
+
 
 def distance(lon1, lat1, lon2, lat2):
     """
@@ -21,60 +22,68 @@ def distance(lon1, lat1, lon2, lat2):
     # haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
     c = 2 * asin(sqrt(a))
     km = 6367 * c
     return km
 
-def fault_length(lons,lats):
+
+def fault_length(lons, lats):
     length = 0.
-    for i in range(len(lons)-1):
-        length += distance(lons[i], lats[i], lons[i+1], lats[i+1])
+    for i in range(len(lons) - 1):
+        length += distance(lons[i], lats[i], lons[i + 1], lats[i + 1])
     return length
-    
+
+
 def find_bounding_box(faults):
     nb_faults = len(faults)
     maxmin_pt_lon, maxmin_pt_lat = [], []
     for fi in range(nb_faults):
-        maxmin_pt_lon.append([np.min([i[0] for i in faults[fi]['geometry']["coordinates"]]),
-                             np.max([i[0] for i in faults[fi]['geometry']["coordinates"]])])
-        maxmin_pt_lat.append([np.min([i[1] for i in faults[fi]['geometry']["coordinates"]]),
-                             np.max([i[1] for i in faults[fi]['geometry']["coordinates"]])])
+        maxmin_pt_lon.append([
+            np.min([i[0] for i in faults[fi]['geometry']["coordinates"]]),
+            np.max([i[0] for i in faults[fi]['geometry']["coordinates"]])
+        ])
+        maxmin_pt_lat.append([
+            np.min([i[1] for i in faults[fi]['geometry']["coordinates"]]),
+            np.max([i[1] for i in faults[fi]['geometry']["coordinates"]])
+        ])
     return maxmin_pt_lon, maxmin_pt_lat
-    
-def find_possible_asso(maxmin_pt_lon,maxmin_pt_lat,plot_fig=False):
+
+
+def find_possible_asso(maxmin_pt_lon, maxmin_pt_lat, plot_fig=False):
     d = 0.5
     assso_fault = []
-    for lon_i,lat_i in zip(maxmin_pt_lon,maxmin_pt_lat):
+    for lon_i, lat_i in zip(maxmin_pt_lon, maxmin_pt_lat):
         assso_fault_i = []
         j_fault = 0
-        for lon_j,lat_j in zip(maxmin_pt_lon,maxmin_pt_lat):
-            if lon_j[0] > lon_i[0]-d and lon_j[0] < lon_i[1]+d :
-                if lat_j[0] > lat_i[0]-d and lat_j[0] < lat_i[1]+d :
+        for lon_j, lat_j in zip(maxmin_pt_lon, maxmin_pt_lat):
+            if lon_j[0] > lon_i[0] - d and lon_j[0] < lon_i[1] + d:
+                if lat_j[0] > lat_i[0] - d and lat_j[0] < lat_i[1] + d:
                     assso_fault_i.append(j_fault)
-                if lat_j[1] > lat_i[0]-d and lat_j[1] < lat_i[1]+d :
+                if lat_j[1] > lat_i[0] - d and lat_j[1] < lat_i[1] + d:
                     assso_fault_i.append(j_fault)
-            if lon_j[1] > lon_i[0]-d and lon_j[1] < lon_i[1]+d :
-                if lat_j[0] > lat_i[0]-d and lat_j[0] < lat_i[1]+d :
+            if lon_j[1] > lon_i[0] - d and lon_j[1] < lon_i[1] + d:
+                if lat_j[0] > lat_i[0] - d and lat_j[0] < lat_i[1] + d:
                     assso_fault_i.append(j_fault)
-                if lat_j[1] > lat_i[0]-d and lat_j[1] < lat_i[1]+d :
+                if lat_j[1] > lat_i[0] - d and lat_j[1] < lat_i[1] + d:
                     assso_fault_i.append(j_fault)
-            j_fault+=1
+            j_fault += 1
         assso_fault_i = list(set(assso_fault_i))
         assso_fault.append(assso_fault_i)
-        
-    if plot_fig == True :
-        x =[]
+
+    if plot_fig == True:
+        x = []
         for i in assso_fault:
-            x.append(len(i)-1-0.5)
+            x.append(len(i) - 1 - 0.5)
         plt.hist(x)
         plt.xlabel("number of close faults to be considered for rupture jump")
         plt.ylabel("number of faults in this situation")
         plt.show()
-    
+
     return assso_fault
 
-def calc_f_dims(faults,plt_fig=False):
+
+def calc_f_dims(faults, plt_fig=False):
     nb_faults = len(faults)
     f_lengths = []
     f_areas = []
@@ -82,24 +91,24 @@ def calc_f_dims(faults,plt_fig=False):
         lons_i = [i[0] for i in faults[fi]['geometry']["coordinates"]]
         lats_i = [i[1] for i in faults[fi]['geometry']["coordinates"]]
 
-        length_i = fault_length(lons_i,lats_i)
+        length_i = fault_length(lons_i, lats_i)
         f_lengths.append(length_i)
-        width_i =((faults[fi]['properties']['lsd']-
-                  faults[fi]['properties']['usd'])/
-                  sin(radians(faults[fi]['properties']['dip'])))
-        
-        f_areas.append(length_i*width_i)
-    if plt_fig ==True:
+        width_i = ((faults[fi]['properties']['lsd'] -
+                    faults[fi]['properties']['usd']) /
+                   sin(radians(faults[fi]['properties']['dip'])))
+
+        f_areas.append(length_i * width_i)
+    if plt_fig == True:
         plt.hist(f_lengths)
         plt.xlabel("Lengths (km)")
         plt.ylabel("Nb faults")
         plt.show()
 
-    print("In total, there are ",round(sum(f_lengths))," km of faults in the model.")
+    print("In total, there are ", round(sum(f_lengths)),
+          " km of faults in the model.")
     return f_lengths, f_areas
 
 
-      
 def calculate_initial_compass_bearing(pointA, pointB):
     """
     Calculates the bearing between two points.
@@ -120,8 +129,8 @@ def calculate_initial_compass_bearing(pointA, pointB):
     :Returns Type:
       float
     """
-#     if (type(pointA) != tuple) or (type(pointB) != tuple):
-#         raise TypeError("Only tuples are supported as arguments")
+    #     if (type(pointA) != tuple) or (type(pointB) != tuple):
+    #         raise TypeError("Only tuples are supported as arguments")
 
     lat1 = radians(pointA[0])
     lat2 = radians(pointB[0])
@@ -129,8 +138,7 @@ def calculate_initial_compass_bearing(pointA, pointB):
     diffLong = radians(pointB[1] - pointA[1])
 
     x = sin(diffLong) * cos(lat2)
-    y = cos(lat1) * sin(lat2) - (sin(lat1)
-            * cos(lat2) * cos(diffLong))
+    y = cos(lat1) * sin(lat2) - (sin(lat1) * cos(lat2) * cos(diffLong))
 
     initial_bearing = atan2(x, y)
 
@@ -143,7 +151,7 @@ def calculate_initial_compass_bearing(pointA, pointB):
     return compass_bearing
 
 
-def wc1994_median_mag( area, rake):
+def wc1994_median_mag(area, rake):
     """
     Return magnitude (Mw) given the area and rake.
 
@@ -169,9 +177,9 @@ def wc1994_median_mag( area, rake):
     else:
         # normal
         return 3.93 + 1.02 * np.log10(area)
-    
-    
+
+
 def mag_to_M0(mag):
     #returns Mo for a given mag
-    M0 = 10. ** (1.5 * mag + 9.1)
+    M0 = 10.**(1.5 * mag + 9.1)
     return M0

@@ -8,7 +8,8 @@ Version 1.2
 """
 import numpy as np
 
+
 def mag_to_M0(mag):
     #returns Mo for a given mag
-    M0 = 10. ** (1.5 * mag + 9.1)
+    M0 = 10.**(1.5 * mag + 9.1)
     return M0

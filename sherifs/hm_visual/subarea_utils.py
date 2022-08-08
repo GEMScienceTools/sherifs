@@ -10,14 +10,13 @@ utils functions for dealing with subareas
 @author: thomas chartier
 """
 
-
 import numpy as np
 import os
 import geojson
 import matplotlib.path as mplPath
 
 
-def get_geom(sub_area_file,model):
+def get_geom(sub_area_file, model):
     '''
     Extracts the names and geometries of the available sub-areas
     
@@ -40,13 +39,13 @@ def get_geom(sub_area_file,model):
     sub_area_lon = []
     sub_area_lat = []
     if not '.geojson' in sub_area_file:
-        read_sub_area_file = open(sub_area_file,'rU')
+        read_sub_area_file = open(sub_area_file, 'rU')
         lines_sub_area = read_sub_area_file.readlines()
         for line in lines_sub_area:
             model_sub_area = line.split('\t')[0]
             if model == model_sub_area:
-                if print_detail == True :
-                    print("rates in sub area :",line.split('\t')[1])
+                if print_detail == True:
+                    print("rates in sub area :", line.split('\t')[1])
                 sub_area_names.append(line.split('\t')[1])
                 sub_area_coord.append(line.split('\t')[2:])
                 sub_area_lon_i = []
@@ -54,11 +53,13 @@ def get_geom(sub_area_file,model):
                 for sub_area_coord_i in line.split('\t')[2:]:
                     if not '\n' in sub_area_coord_i.split(','):
                         if not '' in sub_area_coord_i.split(','):
-                            sub_area_lon_i.append(float(sub_area_coord_i.split(',')[0]))
-                            sub_area_lat_i.append(float(sub_area_coord_i.split(',')[1]))
+                            sub_area_lon_i.append(
+                                float(sub_area_coord_i.split(',')[0]))
+                            sub_area_lat_i.append(
+                                float(sub_area_coord_i.split(',')[1]))
                 sub_area_lon.append(sub_area_lon_i)
                 sub_area_lat.append(sub_area_lat_i)
-    else :
+    else:
         with open(sub_area_file) as f:
             gj = geojson.load(f)
         areas = gj["features"]
@@ -71,9 +72,10 @@ def get_geom(sub_area_file,model):
                 sub_area_lat_i.append(pt[1])
             sub_area_lon.append(sub_area_lon_i)
             sub_area_lat.append(sub_area_lat_i)
-    return sub_area_names,sub_area_lon,sub_area_lat
+    return sub_area_names, sub_area_lon, sub_area_lat
 
-def find_faults_in_sub(fault_names,Lon,Lat,sub_area_lon,sub_area_lat):
+
+def find_faults_in_sub(fault_names, Lon, Lat, sub_area_lon, sub_area_lat):
     '''
     Finds the faults that are inside the subare
 
@@ -94,18 +96,23 @@ def find_faults_in_sub(fault_names,Lon,Lat,sub_area_lon,sub_area_lat):
 
     '''
     Poly_sub = []
-    for x1,y1 in zip(sub_area_lon,sub_area_lat): # creation du polygon de la zone
-        Poly_sub.append((x1,y1))
+    for x1, y1 in zip(sub_area_lon,
+                      sub_area_lat):  # creation du polygon de la zone
+        Poly_sub.append((x1, y1))
     bbPath_sub_area_i = mplPath.Path(Poly_sub)
 
     faults_in_sub_area = []
     index_fault = 0
     for fault_name in fault_names:
         nb_point_in_sub_area = 0
-        for lon_i,lat_i in zip(Lon[index_fault],Lat[index_fault]):
-            if bbPath_sub_area_i.contains_point((lon_i,lat_i)) == 1: #test to know if the point is in the sub_area
+        for lon_i, lat_i in zip(Lon[index_fault], Lat[index_fault]):
+            if bbPath_sub_area_i.contains_point(
+                (lon_i,
+                 lat_i)) == 1:  #test to know if the point is in the sub_area
                 nb_point_in_sub_area += 1
-        if nb_point_in_sub_area > len(Lon[index_fault])/2.: #if more than half the points of the trace are in the sub area
+        if nb_point_in_sub_area > len(
+                Lon[index_fault]
+        ) / 2.:  #if more than half the points of the trace are in the sub area
             faults_in_sub_area.append(fault_name)  #the fault is in the sub area
-        index_fault +=1
+        index_fault += 1
     return faults_in_sub_area
